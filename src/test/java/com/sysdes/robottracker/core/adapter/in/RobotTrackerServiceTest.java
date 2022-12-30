@@ -5,17 +5,19 @@ import com.sysdes.robottracker.common.dto.Location;
 import com.sysdes.robottracker.common.dto.Movement;
 import com.sysdes.robottracker.common.enums.RobotStatus;
 import com.sysdes.robottracker.core.domain.model.Robot;
+import com.sysdes.robottracker.core.exception.ResourceNotFoundException;
 import com.sysdes.robottracker.core.port.in.dto.*;
 import com.sysdes.robottracker.core.port.in.iface.CreateRobotCommand;
 import com.sysdes.robottracker.core.port.in.iface.GetRobotCommand;
 import com.sysdes.robottracker.core.port.in.iface.MoveRobotCommand;
-import com.sysdes.robottracker.core.port.out.iface.RobotRepository;
+import com.sysdes.robottracker.core.port.out.iface.RobotTrackerRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,20 +30,29 @@ class RobotTrackerServiceTest {
     private GetRobotCommand getRobotCommand;
     private MoveRobotCommand moveRobotCommand;
 
-    private RobotRepository robotRepository;
+    private RobotTrackerRepository robotTrackerRepository;
 
     @BeforeEach
     public void beforeEach() {
-        robotRepository = Mockito.mock(RobotRepository.class);
-        createRobotCommand = new RobotTrackerService(robotRepository);
-        getRobotCommand = new RobotTrackerService(robotRepository);
-        moveRobotCommand = new RobotTrackerService(robotRepository);
+        robotTrackerRepository = Mockito.mock(RobotTrackerRepository.class);
+        createRobotCommand = new RobotTrackerService(robotTrackerRepository);
+        getRobotCommand = new RobotTrackerService(robotTrackerRepository);
+        moveRobotCommand = new RobotTrackerService(robotTrackerRepository);
     }
 
     /********************************** USE CASE: CreteRobot ******************************************************/
     @Test
     void createRobot() throws InvalidArgumentException {
-        CreateRobotRequest req = new CreateRobotRequest("robot", new Location(0, 0));
+        final String name = "robot";
+        final Location location = new Location(0, 0);
+        Robot mockRobot = Robot.builder()
+                .name(name)
+                .currentLocation(location)
+                .status(RobotStatus.ALIVE)
+                .build();
+
+        when(robotTrackerRepository.save(any(Robot.class))).thenReturn(mockRobot);
+        CreateRobotRequest req = new CreateRobotRequest(name, location);
         CreateRobotResponse res = createRobotCommand.createRobot(req);
 
         assertNotNull(res);
@@ -70,8 +81,16 @@ class RobotTrackerServiceTest {
 
     /********************************** USE CASE: GetRobot ********************************************************/
     @Test
-    void getRobot() throws InvalidArgumentException {
-        GetRobotRequest req = new GetRobotRequest("robot");
+    void getRobot() throws InvalidArgumentException, ResourceNotFoundException {
+        final String name = "robot";
+        Robot mockRobot = Robot.builder()
+                .name(name)
+                .currentLocation(new Location(0, 0))
+                .status(RobotStatus.ALIVE)
+                .build();
+        when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.ofNullable(mockRobot));
+
+        GetRobotRequest req = new GetRobotRequest(name);
         GetRobotResponse res = getRobotCommand.getRobot(req);
 
         assertNotNull(res);
@@ -95,7 +114,7 @@ class RobotTrackerServiceTest {
     /********************************** USE CASE: MoveRobot ********************************************************/
 
     @Test
-    void moveRobot() throws InvalidArgumentException {
+    void moveRobot() throws InvalidArgumentException, ResourceNotFoundException {
         String name = "robot";
         Movement move = Movement.builder()
                 .north(1)
@@ -106,7 +125,8 @@ class RobotTrackerServiceTest {
                 .name(name)
                 .currentLocation(new Location(0, 0))
                 .build();
-        when(robotRepository.findRobotByName(eq(name))).thenReturn(mockRobot);
+        when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.ofNullable(mockRobot));
+        when(robotTrackerRepository.save(any(Robot.class))).thenReturn(mockRobot);
         MoveRobotRequest req = new MoveRobotRequest(name, move);
         MoveRobotResponse res = moveRobotCommand.moveRobot(req);
 
@@ -118,7 +138,7 @@ class RobotTrackerServiceTest {
     }
 
     @Test
-    void moveRobot_NegativeMoves() throws InvalidArgumentException {
+    void moveRobot_NegativeMoves() throws InvalidArgumentException, ResourceNotFoundException {
         String name = "robot";
         Movement move = Movement.builder()
                 .south(1)
@@ -129,7 +149,8 @@ class RobotTrackerServiceTest {
                 .name(name)
                 .currentLocation(new Location(0, 0))
                 .build();
-        when(robotRepository.findRobotByName(eq(name))).thenReturn(mockRobot);
+        when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.ofNullable(mockRobot));
+        when(robotTrackerRepository.save(any(Robot.class))).thenReturn(mockRobot);
         MoveRobotRequest req = new MoveRobotRequest(name, move);
         MoveRobotResponse res = moveRobotCommand.moveRobot(req);
 

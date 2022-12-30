@@ -1,4 +1,4 @@
-package com.sysdes.robottracker.common.utils;
+package com.sysdes.robottracker.core.utils;
 
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import com.sysdes.robottracker.core.port.in.dto.CreateRobotRequest;
