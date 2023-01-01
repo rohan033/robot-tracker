@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface RobotTrackerRepository {
     Robot save(Robot robot);
-    Optional<Robot> findRobotByName(String name);
+    Optional<com.sysdes.rts.application.model.Robot> findRobotByName(String name);
 }

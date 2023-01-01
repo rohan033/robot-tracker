@@ -5,6 +5,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>rts-application</module>
+        <module>rts-dal</module>
     </modules>
 
     <groupId>com.sysdes</groupId>
