@@ -6,6 +6,7 @@
     <modules>
         <module>rts-application</module>
         <module>rts-dal</module>
+        <module>testing</module>
     </modules>
 
     <groupId>com.sysdes</groupId>

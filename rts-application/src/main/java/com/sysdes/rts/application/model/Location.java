@@ -6,10 +6,11 @@ import lombok.*;
 @Getter
 @EqualsAndHashCode
 @Builder(toBuilder = true)
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Location {
-    private final int x;
-    private final int y;
+    private int x;
+    private int y;
 
     public Location applyMovement(Movement movement) {
         if (movement == null) {
