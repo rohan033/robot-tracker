@@ -1,5 +1,6 @@
 package com.sysdes.rts.application.api.robot.dto.response;
 
+import com.sysdes.rts.application.enums.RobotStatus;
 import com.sysdes.rts.application.model.Location;
 import com.sysdes.rts.application.model.Movement;
 import lombok.Builder;
@@ -12,5 +13,5 @@ public class MoveRobotResponse {
     private Location oldLocation;
     private Location currentLocation;
     private Movement movement;
-    private Error error;
+    private RobotStatus status;
 }

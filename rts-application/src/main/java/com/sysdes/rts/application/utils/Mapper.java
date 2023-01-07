@@ -33,6 +33,7 @@ public class Mapper {
                 .oldLocation(robot.getCurrentLocation())
                 .currentLocation(movedRobot.getCurrentLocation())
                 .movement(request.getMovement())
+                .status(movedRobot.getStatus())
                 .build();
     }
 

@@ -43,7 +43,7 @@ public class RobotTrackerServiceIT {
                 .andReturn();
 
         Assertions.assertEquals(createResult.getResponse().getContentAsString(),
-                "{\"name\":\"sofia\",\"currentLocation\":{\"x\":0,\"y\":0},\"status\":\"ALIVE\",\"error\":null}"
+                "{\"data\":{\"name\":\"sofia\",\"currentLocation\":{\"x\":0,\"y\":0},\"status\":\"ALIVE\"},\"error\":null}"
         );
 
         MvcResult getResult = mockMvc.perform(MockMvcRequestBuilders.get("/v1/api/robots/{name}", "sofia"))
@@ -52,7 +52,7 @@ public class RobotTrackerServiceIT {
                 .andReturn();
 
         Assertions.assertEquals(getResult.getResponse().getContentAsString(),
-                "{\"name\":\"sofia\",\"currentLocation\":{\"x\":0,\"y\":0},\"status\":\"ALIVE\",\"error\":null}"
+                "{\"data\":{\"name\":\"sofia\",\"currentLocation\":{\"x\":0,\"y\":0},\"status\":\"ALIVE\"},\"error\":null}"
         );
 
         MoveRobotRequest mr = new MoveRobotRequest("sofia", Movement.builder().east(1).build());
@@ -67,7 +67,7 @@ public class RobotTrackerServiceIT {
                 .andReturn();
 
         Assertions.assertEquals(moveResult.getResponse().getContentAsString(),
-                "{\"name\":\"sofia\",\"oldLocation\":{\"x\":0,\"y\":0},\"currentLocation\":{\"x\":1,\"y\":0},\"movement\":{\"north\":null,\"east\":1,\"west\":null,\"south\":null},\"error\":null}"
+                "{\"data\":{\"name\":\"sofia\",\"oldLocation\":{\"x\":0,\"y\":0},\"currentLocation\":{\"x\":1,\"y\":0},\"movement\":{\"north\":null,\"east\":1,\"west\":null,\"south\":null},\"status\":\"ALIVE\"},\"error\":null}"
         );
     }
 
@@ -86,7 +86,7 @@ public class RobotTrackerServiceIT {
 
         Assertions.assertEquals(moveResult.getResponse().getStatus(), 422);
         Assertions.assertEquals(moveResult.getResponse().getContentAsString(),
-                "{\"name\":null,\"oldLocation\":null,\"currentLocation\":null,\"movement\":null,\"error\":{\"message\":\"Robot doesn't exist with name sofia\"}}"
+                "{\"data\":null,\"error\":{\"message\":\"Robot doesn't exist with name sofia\"}}"
         );
     }
 }

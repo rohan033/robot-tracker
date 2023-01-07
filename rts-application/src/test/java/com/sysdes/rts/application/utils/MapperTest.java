@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 class MapperTest {
 
     @Test
-    public void constructor() {
+    public void test_constructor() {
         Mapper mapper = new Mapper();
         assert mapper != null;
     }

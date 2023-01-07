@@ -9,11 +9,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class RobotTest {
     private Robot robot;
     @BeforeEach
-    public void beforeEach(){
+    public void test_beforeEach(){
         robot = Robot.builder().name("robot").currentLocation(new Location(0,0)).status(RobotStatus.ALIVE).build();
     }
+
     @Test
-    void move() {
+    void test_NullId(){
+        assertNull(robot.getId());
+    }
+
+    @Test
+    void test_move() {
         Movement movement = Movement.builder().east(1).north(1).build();
         Robot movedRobot = robot.move(movement);
 
@@ -24,7 +30,7 @@ class RobotTest {
     }
 
     @Test
-    void move_NullMovement() {
+    void test_move_NullMovement() {
         Robot movedRobot = robot.move(null);
 
         assertNotNull(movedRobot);
@@ -36,7 +42,7 @@ class RobotTest {
     }
 
     @Test
-    void builder_ToString(){
+    void test_builder_ToString(){
         Robot.RobotBuilder builder = Robot.builder();
         String str = builder.toString();
         assertEquals(str, "Robot.RobotBuilder(id=null, name=null, currentLocation=null, status=null)");
