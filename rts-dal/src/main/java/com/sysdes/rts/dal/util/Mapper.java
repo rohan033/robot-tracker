@@ -10,6 +10,7 @@ public class Mapper {
 
     public static Robot toEntity(com.sysdes.rts.application.model.Robot robot) {
         return Robot.builder()
+                .id(robot.getId())
                 .name(robot.getName())
                 .status(robot.getStatus().name())
                 .location(serdes.toJson(robot.getCurrentLocation()).get())
@@ -18,6 +19,7 @@ public class Mapper {
 
     public static com.sysdes.rts.application.model.Robot toModel(Robot robot) {
         return com.sysdes.rts.application.model.Robot.builder()
+                .id(robot.getId())
                 .name(robot.getName())
                 .status(RobotStatus.valueOf(robot.getStatus()))
                 .currentLocation(serdes.fromJson(robot.getLocation(), Location.class).get())

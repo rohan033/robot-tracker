@@ -12,4 +12,5 @@ public class MoveRobotResponse {
     private Location oldLocation;
     private Location currentLocation;
     private Movement movement;
+    private Error error;
 }

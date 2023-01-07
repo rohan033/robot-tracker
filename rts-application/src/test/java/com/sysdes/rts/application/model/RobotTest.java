@@ -10,7 +10,7 @@ class RobotTest {
     private Robot robot;
     @BeforeEach
     public void beforeEach(){
-        robot = new Robot("robot", new Location(0,0), RobotStatus.ALIVE);
+        robot = Robot.builder().name("robot").currentLocation(new Location(0,0)).status(RobotStatus.ALIVE).build();
     }
     @Test
     void move() {
@@ -39,6 +39,6 @@ class RobotTest {
     void builder_ToString(){
         Robot.RobotBuilder builder = Robot.builder();
         String str = builder.toString();
-        assertEquals(str, "Robot.RobotBuilder(name=null, currentLocation=null, status=null)");
+        assertEquals(str, "Robot.RobotBuilder(id=null, name=null, currentLocation=null, status=null)");
     }
 }

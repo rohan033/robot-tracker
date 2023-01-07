@@ -9,6 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class Robot {
+    private Integer id;
     private String name;
     private Location currentLocation;
     private RobotStatus status;

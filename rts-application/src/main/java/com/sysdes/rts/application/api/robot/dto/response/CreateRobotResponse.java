@@ -12,4 +12,5 @@ public class CreateRobotResponse {
     private String name;
     private Location currentLocation;
     private RobotStatus status;
+    private Error error;
 }

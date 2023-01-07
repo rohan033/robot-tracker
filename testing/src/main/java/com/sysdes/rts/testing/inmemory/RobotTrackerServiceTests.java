@@ -1,4 +1,4 @@
-package com.sysdes.rts.testing.integration;
+package com.sysdes.rts.testing.inmemory;
 
 import com.sysdes.rts.application.api.robot.dto.request.CreateRobotRequest;
 import com.sysdes.rts.application.api.robot.dto.request.MoveRobotRequest;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-public class RobotTrackerInMemoryRepoTests {
+public class RobotTrackerServiceTests {
     private RobotTrackerService rts;
 
     @BeforeEach
