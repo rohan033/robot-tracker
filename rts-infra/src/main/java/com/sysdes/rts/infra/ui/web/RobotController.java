@@ -30,7 +30,7 @@ public class RobotController {
         try {
             CreateRobotResponse res = robotTrackerService.createRobot(request);
             return new ResponseEntity<>(new ServiceResponse<>(res), HttpStatus.OK);
-        } catch (InvalidArgumentException e) {
+        } catch (InvalidArgumentException | ResourceAlreadyExistsException e) {
             return new ResponseEntity<>(
                     new ServiceResponse<>(
                             null, new Error(e.getMessage())),
