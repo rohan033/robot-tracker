@@ -8,6 +8,7 @@ import com.sysdes.rts.application.exception.InvalidArgumentException;
 import com.sysdes.rts.application.exception.ResourceNotFoundException;
 import com.sysdes.rts.application.model.Location;
 import com.sysdes.rts.application.model.Movement;
+import com.sysdes.rts.application.service.HoleService;
 import com.sysdes.rts.application.service.RobotTrackerService;
 import com.sysdes.rts.application.spi.repository.RobotTrackerRepository;
 import com.sysdes.rts.dal.adapter.RobotTrackerRepositoryAdapter;
@@ -20,11 +21,13 @@ import java.util.HashMap;
 
 public class RobotTrackerServiceTests {
     private RobotTrackerService rts;
+    private HoleService hs;
 
     @BeforeEach
     public void beforeEach(){
-        RobotTrackerRepository rtr = new RobotTrackerRepositoryAdapter(new InMemoryStore(new HashMap<>()));
-        rts = new RobotTrackerService(rtr);
+        RobotTrackerRepository rtr = new RobotTrackerRepositoryAdapter(new InMemoryStore(new HashMap<>(), new HashMap<>()));
+        hs = new HoleService(rtr);
+        rts = new RobotTrackerService(rtr, hs);
     }
 
 
