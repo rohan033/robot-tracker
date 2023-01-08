@@ -2,6 +2,7 @@ package com.sysdes.rts.dal.util;
 
 import com.sysdes.rts.application.enums.RobotStatus;
 import com.sysdes.rts.application.model.Location;
+import com.sysdes.rts.dal.entity.Hole;
 import com.sysdes.rts.dal.entity.Robot;
 
 public class Mapper {
@@ -24,5 +25,13 @@ public class Mapper {
                 .status(RobotStatus.valueOf(robot.getStatus()))
                 .currentLocation(serdes.fromJson(robot.getLocation(), Location.class).get())
                 .build();
+    }
+
+    public static Location toLocation(Hole hole){
+        return new Location(hole.getX(), hole.getY());
+    }
+
+    public static Hole toHole(Location location) {
+        return Hole.builder().x(location.getX()).y(location.getY()).build();
     }
 }
