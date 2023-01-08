@@ -1,5 +1,7 @@
 package com.sysdes.rts.application.service;
 
+import com.sysdes.rts.application.exception.IllegalStateException;
+import com.sysdes.rts.application.exception.ResourceAlreadyExistsException;
 import com.sysdes.rts.application.model.Location;
 import com.sysdes.rts.application.model.Movement;
 import com.sysdes.rts.application.api.robot.dto.request.CreateRobotRequest;
@@ -50,7 +52,7 @@ class RobotTrackerServiceTest {
 
     /********************************** USE CASE: CreteRobot ******************************************************/
     @Test
-    void test_createRobot() throws InvalidArgumentException {
+    void test_createRobot() throws InvalidArgumentException, ResourceAlreadyExistsException {
         final String name = "robot";
         final Location location = new Location(0, 0);
         Robot mockRobot = Robot.builder()
@@ -129,7 +131,7 @@ class RobotTrackerServiceTest {
     /********************************** USE CASE: MoveRobot ********************************************************/
 
     @Test
-    void test_moveRobot() throws InvalidArgumentException, ResourceNotFoundException {
+    void test_moveRobot() throws InvalidArgumentException, ResourceNotFoundException, IllegalStateException {
         String name = "robot";
         Movement move = Movement.builder()
                 .north(1)
@@ -156,7 +158,7 @@ class RobotTrackerServiceTest {
     }
 
     @Test
-    void test_moveRobot_NegativeMoves() throws InvalidArgumentException, ResourceNotFoundException {
+    void test_moveRobot_NegativeMoves() throws InvalidArgumentException, ResourceNotFoundException, IllegalStateException {
         String name = "robot";
         Movement move = Movement.builder()
                 .south(1)
@@ -164,9 +166,11 @@ class RobotTrackerServiceTest {
                 .build();
 
         Robot mockRobot = Robot.builder()
+                .status(RobotStatus.ALIVE)
                 .name(name)
                 .currentLocation(new Location(0, 0))
                 .build();
+        when(holeService.getHole(any())).thenReturn(Optional.empty());
         when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.ofNullable(mockRobot));
         when(robotTrackerRepository.save(any(Robot.class))).thenReturn(mockRobot);
         MoveRobotRequest req = new MoveRobotRequest(name, move);
@@ -205,5 +209,45 @@ class RobotTrackerServiceTest {
         when(robotTrackerRepository.findRobotByName(any())).thenReturn(Optional.empty());
         Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> moveRobotCommand.moveRobot(new MoveRobotRequest("robot", Movement.builder().build())));
+    }
+
+    @Test
+    void test_moveRobot_AliveToDead() throws IllegalStateException, InvalidArgumentException, ResourceNotFoundException {
+        String name = "robot";
+        Movement move = Movement.builder()
+                .south(1)
+                .east(1)
+                .build();
+
+        Robot mockRobot = Robot.builder()
+                .status(RobotStatus.ALIVE)
+                .name(name)
+                .currentLocation(new Location(0, 0))
+                .build();
+        when(holeService.getHole(any())).thenReturn(Optional.ofNullable(Location.builder().x(1).y(-1).build()));
+        when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.of(mockRobot));
+        when(robotTrackerRepository.save(any(Robot.class))).thenReturn(mockRobot);
+        MoveRobotRequest req = new MoveRobotRequest(name, move);
+        MoveRobotResponse res = moveRobotCommand.moveRobot(req);
+
+        assertNotNull(res);
+        assertEquals(res.getName(), name);
+        assertEquals(res.getMovement(), move);
+        assertEquals(res.getCurrentLocation(), new Location(1, -1));
+        assertEquals(res.getOldLocation(), mockRobot.getCurrentLocation());
+        assertEquals(res.getStatus(), RobotStatus.DEAD);
+    }
+
+    @Test
+    void test_moveRobot_DeadRobot(){
+        String name = "robot";
+        Robot mockRobot = Robot.builder()
+                .status(RobotStatus.DEAD)
+                .name(name)
+                .currentLocation(new Location(0, 0))
+                .build();
+        when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.ofNullable(mockRobot));
+        Assertions.assertThrows(IllegalStateException.class,
+                ()-> moveRobotCommand.moveRobot(new MoveRobotRequest(name, Movement.builder().build())));
     }
 }

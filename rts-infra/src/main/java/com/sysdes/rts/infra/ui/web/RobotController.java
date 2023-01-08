@@ -6,7 +6,9 @@ import com.sysdes.rts.application.api.robot.dto.request.MoveRobotRequest;
 import com.sysdes.rts.application.api.robot.dto.response.CreateRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.GetRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.MoveRobotResponse;
+import com.sysdes.rts.application.exception.IllegalStateException;
 import com.sysdes.rts.application.exception.InvalidArgumentException;
+import com.sysdes.rts.application.exception.ResourceAlreadyExistsException;
 import com.sysdes.rts.application.exception.ResourceNotFoundException;
 import com.sysdes.rts.application.service.RobotTrackerService;
 import com.sysdes.rts.infra.dto.Error;
@@ -24,7 +26,7 @@ public class RobotController {
     private final RobotTrackerService robotTrackerService;
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
-    public ResponseEntity<ServiceResponse<CreateRobotResponse>> create(@RequestBody CreateRobotRequest request) {
+    public ResponseEntity<ServiceResponse<CreateRobotResponse>> create(@RequestBody CreateRobotRequest request) throws ResourceAlreadyExistsException {
         try {
             CreateRobotResponse res = robotTrackerService.createRobot(request);
             return new ResponseEntity<>(new ServiceResponse<>(res), HttpStatus.OK);
@@ -56,7 +58,7 @@ public class RobotController {
         try {
             MoveRobotResponse res = robotTrackerService.moveRobot(request);
             return new ResponseEntity<>(new ServiceResponse<>(res), HttpStatus.OK);
-        } catch (ResourceNotFoundException | InvalidArgumentException e) {
+        } catch (ResourceNotFoundException | InvalidArgumentException | IllegalStateException e) {
             return new ResponseEntity<>(
                     new ServiceResponse<>(
                             null, new Error(e.getMessage())),

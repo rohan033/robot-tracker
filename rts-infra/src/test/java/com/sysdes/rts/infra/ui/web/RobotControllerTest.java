@@ -7,13 +7,14 @@ import com.sysdes.rts.application.api.robot.dto.response.CreateRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.GetRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.MoveRobotResponse;
 import com.sysdes.rts.application.enums.RobotStatus;
+import com.sysdes.rts.application.exception.IllegalStateException;
 import com.sysdes.rts.application.exception.InvalidArgumentException;
+import com.sysdes.rts.application.exception.ResourceAlreadyExistsException;
 import com.sysdes.rts.application.exception.ResourceNotFoundException;
 import com.sysdes.rts.application.model.Location;
 import com.sysdes.rts.application.model.Movement;
 import com.sysdes.rts.application.service.RobotTrackerService;
 import com.sysdes.rts.infra.dto.ServiceResponse;
-import junit.framework.TestCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ import org.springframework.http.ResponseEntity;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class RobotControllerTest extends TestCase {
+public class RobotControllerTest {
 
     private RobotTrackerService robotTrackerService;
     private RobotController robotController;
@@ -47,7 +48,7 @@ public class RobotControllerTest extends TestCase {
     }
 
     @Test
-    public void test_create() throws InvalidArgumentException {
+    public void test_create() throws InvalidArgumentException, ResourceAlreadyExistsException {
         CreateRobotRequest req = new CreateRobotRequest("sofia", new Location(0,0));
         CreateRobotResponse res = CreateRobotResponse.builder()
                 .name("sofia")
@@ -68,7 +69,7 @@ public class RobotControllerTest extends TestCase {
     }
 
     @Test
-    public void test_create_error() throws InvalidArgumentException {
+    public void test_create_error() throws InvalidArgumentException, ResourceAlreadyExistsException {
         CreateRobotRequest req = new CreateRobotRequest("sofia", new Location(0,0));
         when(robotTrackerService.createRobot(any())).thenThrow(
                 new InvalidArgumentException(new String[]{"Invalid values"})
@@ -126,7 +127,7 @@ public class RobotControllerTest extends TestCase {
 
 
     @Test
-    public void test_move() throws InvalidArgumentException, ResourceNotFoundException {
+    public void test_move() throws InvalidArgumentException, ResourceNotFoundException, IllegalStateException {
         MoveRobotRequest req = new MoveRobotRequest("sofia", Movement.builder().east(1).build());
         MoveRobotResponse res = MoveRobotResponse.builder()
                 .name("sofia")
@@ -148,7 +149,7 @@ public class RobotControllerTest extends TestCase {
     }
 
     @Test
-    public void test_move_error() throws InvalidArgumentException, ResourceNotFoundException {
+    public void test_move_error() throws InvalidArgumentException, ResourceNotFoundException, IllegalStateException {
         MoveRobotRequest req = new MoveRobotRequest("sofia", Movement.builder().east(1).build());
         when(robotTrackerService.moveRobot(any())).thenThrow(
                 new InvalidArgumentException(new String[]{"Invalid values"})

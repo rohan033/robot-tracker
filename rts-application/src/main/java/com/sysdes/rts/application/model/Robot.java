@@ -22,4 +22,12 @@ public class Robot {
         Location newLocation = this.currentLocation.applyMovement(movement);
         return this.toBuilder().currentLocation(newLocation).build();
     }
+
+    public Robot move(Movement movement, boolean isHole) {
+        Robot robot = move(movement);
+        if(!isHole){
+            return robot;
+        }
+        return robot.toBuilder().status(RobotStatus.DEAD).build();
+    }
 }

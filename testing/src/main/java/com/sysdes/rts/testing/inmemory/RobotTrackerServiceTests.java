@@ -4,7 +4,9 @@ import com.sysdes.rts.application.api.robot.dto.request.CreateRobotRequest;
 import com.sysdes.rts.application.api.robot.dto.request.MoveRobotRequest;
 import com.sysdes.rts.application.api.robot.dto.response.CreateRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.MoveRobotResponse;
+import com.sysdes.rts.application.exception.IllegalStateException;
 import com.sysdes.rts.application.exception.InvalidArgumentException;
+import com.sysdes.rts.application.exception.ResourceAlreadyExistsException;
 import com.sysdes.rts.application.exception.ResourceNotFoundException;
 import com.sysdes.rts.application.model.Location;
 import com.sysdes.rts.application.model.Movement;
@@ -32,7 +34,7 @@ public class RobotTrackerServiceTests {
 
 
     @Test
-    public void test_CreateAndMoveRobot_Success() throws InvalidArgumentException, ResourceNotFoundException {
+    public void test_CreateAndMoveRobot_Success() throws InvalidArgumentException, ResourceNotFoundException, IllegalStateException, ResourceAlreadyExistsException {
         CreateRobotResponse crRes = rts.createRobot(new CreateRobotRequest("robot", new Location(0,0)));
         MoveRobotResponse mrRes = rts.moveRobot(new MoveRobotRequest(crRes.getName(), Movement.builder().east(1).north(1).build()));
 
