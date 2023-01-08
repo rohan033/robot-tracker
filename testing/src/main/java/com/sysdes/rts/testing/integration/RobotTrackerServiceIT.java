@@ -31,7 +31,6 @@ public class RobotTrackerServiceIT {
     public void test_CreateAndMoveRobot_Success() throws Exception {
         CreateRobotRequest cr = new CreateRobotRequest("sofia", new Location(0, 0));
 
-
         MvcResult createResult = mockMvc.perform(
                         MockMvcRequestBuilders.post("/v1/api/robots/")
                                 .contentType(MediaType.APPLICATION_JSON)

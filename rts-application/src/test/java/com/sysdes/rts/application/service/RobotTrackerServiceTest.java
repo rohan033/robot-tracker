@@ -27,8 +27,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 class RobotTrackerServiceTest {
@@ -88,6 +87,14 @@ class RobotTrackerServiceTest {
         Assertions.assertThrows(InvalidArgumentException.class,
                 () -> createRobotCommand.createRobot(new CreateRobotRequest("robot", null)));
     }
+
+    @Test
+    void test_createRobot_RobotAlreadyExists() {
+        when(robotTrackerRepository.findRobotByName("robot")).thenReturn(Optional.of(Robot.builder().build()));
+        Assertions.assertThrows(ResourceAlreadyExistsException.class,
+                () -> createRobotCommand.createRobot(new CreateRobotRequest("robot", new Location(0,0))));
+    }
+
 
     /********************************** USE CASE: GetRobot ********************************************************/
     @Test
@@ -250,4 +257,5 @@ class RobotTrackerServiceTest {
         Assertions.assertThrows(IllegalStateException.class,
                 ()-> moveRobotCommand.moveRobot(new MoveRobotRequest(name, Movement.builder().build())));
     }
+
 }

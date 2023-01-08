@@ -59,13 +59,15 @@ public class RobotTrackerService implements CreateRobotCommand, GetRobotCommand,
         if(!alive.isPresent())
             throw new IllegalStateException("Robot " + request.getName() + " is already dead and cannot be moved");
 
-        return alive.map(r -> {
-            Location newLocation = r.getCurrentLocation().applyMovement(request.getMovement());
-            Optional<Location> hole = holeService.getHole(newLocation);
-            Robot movedRobot = r.move(request.getMovement(), hole.isPresent());
-            robotTrackerRepository.save(movedRobot);
-            return Mapper.getMoveResponse(request, r, movedRobot);
-        }).get();
+        return alive.map(r -> moveAndSaveRobot(r, request)).get();
+    }
+
+    private MoveRobotResponse moveAndSaveRobot(Robot r, MoveRobotRequest request){
+        Location newLocation = r.getCurrentLocation().applyMovement(request.getMovement());
+        Optional<Location> hole = holeService.getHole(newLocation);
+        Robot movedRobot = r.move(request.getMovement(), hole.isPresent());
+        robotTrackerRepository.save(movedRobot);
+        return Mapper.getMoveResponse(request, r, movedRobot);
     }
 
 }

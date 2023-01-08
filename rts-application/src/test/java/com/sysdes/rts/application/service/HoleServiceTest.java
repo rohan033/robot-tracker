@@ -53,9 +53,16 @@ public class HoleServiceTest {
     }
 
     @Test
-    public void test_createHole_nullCoordinates() throws InvalidArgumentException {
+    public void test_createHole_nullXCoordinates() throws InvalidArgumentException {
         Assertions.assertThrows(InvalidArgumentException.class,  ()->{
-            holeService.createHole(new CreateHoleRequest());
+            holeService.createHole(new CreateHoleRequest(null, 0));
+        });
+    }
+
+    @Test
+    public void test_createHole_nullYCoordinates() throws InvalidArgumentException {
+        Assertions.assertThrows(InvalidArgumentException.class,  ()->{
+            holeService.createHole(new CreateHoleRequest(0, null));
         });
     }
 

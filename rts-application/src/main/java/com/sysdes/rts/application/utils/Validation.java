@@ -35,10 +35,4 @@ public class Validation {
         notNull(request.getX(), "X coordinate for Hole cannot be null");
         notNull(request.getY(), "Y coordinate for Hole cannot be null");
     }
-
-    public static void validate(Location request) throws InvalidArgumentException {
-        notNull(request, "Request cannot be null");
-        notNull(request.getX(), "X coordinate for Hole cannot be null");
-        notNull(request.getY(), "Y coordinate for Hole cannot be null");
-    }
 }

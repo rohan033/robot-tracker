@@ -6,5 +6,5 @@ import com.sysdes.rts.application.model.Location;
 import java.util.Optional;
 
 public interface GetHoleCommand {
-    Optional<Location> getHole(Location request) throws InvalidArgumentException;
+    Optional<Location> getHole(Location request);
 }
