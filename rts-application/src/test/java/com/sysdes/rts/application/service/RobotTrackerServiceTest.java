@@ -36,13 +36,16 @@ class RobotTrackerServiceTest {
     private MoveRobotCommand moveRobotCommand;
 
     private RobotTrackerRepository robotTrackerRepository;
+    private HoleService holeService;
 
     @BeforeEach
     public void test_beforeEach() {
         robotTrackerRepository = Mockito.mock(RobotTrackerRepository.class);
-        createRobotCommand = new RobotTrackerService(robotTrackerRepository);
-        getRobotCommand = new RobotTrackerService(robotTrackerRepository);
-        moveRobotCommand = new RobotTrackerService(robotTrackerRepository);
+        holeService = Mockito.mock(HoleService.class);
+
+        createRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService);
+        getRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService);
+        moveRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService);
     }
 
     /********************************** USE CASE: CreteRobot ******************************************************/

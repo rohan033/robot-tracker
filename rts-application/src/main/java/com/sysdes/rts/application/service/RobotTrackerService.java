@@ -24,6 +24,7 @@ import java.util.Optional;
 public class RobotTrackerService implements CreateRobotCommand, GetRobotCommand, MoveRobotCommand {
 
     private final RobotTrackerRepository robotTrackerRepository;
+    private final HoleService holeService;
 
     @Override
     public CreateRobotResponse createRobot(CreateRobotRequest request) throws InvalidArgumentException {

@@ -1,12 +1,15 @@
 package com.sysdes.rts.application.utils;
 
 
+import com.sysdes.rts.application.api.robot.dto.request.CreateHoleRequest;
 import com.sysdes.rts.application.api.robot.dto.request.CreateRobotRequest;
 import com.sysdes.rts.application.api.robot.dto.request.MoveRobotRequest;
+import com.sysdes.rts.application.api.robot.dto.response.CreateHoleResponse;
 import com.sysdes.rts.application.api.robot.dto.response.CreateRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.GetRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.MoveRobotResponse;
 import com.sysdes.rts.application.enums.RobotStatus;
+import com.sysdes.rts.application.model.Location;
 import com.sysdes.rts.application.model.Robot;
 
 public class Mapper {
@@ -44,4 +47,20 @@ public class Mapper {
                 .status(RobotStatus.ALIVE)
                 .build();
     }
+
+    public static CreateHoleResponse toCreateHoleResponse(Location location){
+        return CreateHoleResponse.builder()
+                .x(location.getX())
+                .y(location.getY())
+                .build();
+    }
+
+    public static Location toLocation(CreateHoleRequest request){
+        return Location.builder()
+                .x(request.getX())
+                .y(request.getY())
+                .build();
+    }
+
+
 }

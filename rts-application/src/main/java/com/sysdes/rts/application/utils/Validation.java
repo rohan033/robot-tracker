@@ -1,5 +1,6 @@
 package com.sysdes.rts.application.utils;
 
+import com.sysdes.rts.application.api.robot.dto.request.CreateHoleRequest;
 import com.sysdes.rts.application.exception.InvalidArgumentException;
 import com.sysdes.rts.application.api.robot.dto.request.CreateRobotRequest;
 import com.sysdes.rts.application.api.robot.dto.request.GetRobotRequest;
@@ -26,5 +27,11 @@ public class Validation {
         notNull(request, "Request cannot be null");
         notNull(request.getName(), "Robot name cannot be null");
         notNull(request.getMovement(), "Movement cannot be null");
+    }
+
+    public static void validate(CreateHoleRequest request) throws InvalidArgumentException {
+        notNull(request, "Request cannot be null");
+        notNull(request.getX(), "X coordinate for Hole cannot be null");
+        notNull(request.getY(), "Y coordinate for Hole cannot be null");
     }
 }
