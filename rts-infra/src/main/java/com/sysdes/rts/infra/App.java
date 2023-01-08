@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 
 @EntityScan(basePackages = "com.sysdes.rts.dal.*")
-@ComponentScan(basePackages = {"com.sysdes.rts.*","org.springdoc"})
+@ComponentScan(basePackages = {"com.sysdes.rts.*"})
 @SpringBootApplication
 public class App {
     public static void main(String[] args) {
