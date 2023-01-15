@@ -16,6 +16,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <skipPiTest>${skipPiTest}</skipPiTest>
     </properties>
 
     <dependencies>
@@ -148,6 +149,7 @@
                 </dependencies>
 
                 <configuration>
+                    <skip>${skipPiTest}</skip>
                     <targetClasses>
                         <param>com.sysdes.rts.application.*</param>
                     </targetClasses>
