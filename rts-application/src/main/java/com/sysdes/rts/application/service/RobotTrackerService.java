@@ -17,7 +17,11 @@ import com.sysdes.rts.application.model.Robot;
 import com.sysdes.rts.application.api.robot.ports.CreateRobotCommand;
 import com.sysdes.rts.application.api.robot.ports.GetRobotCommand;
 import com.sysdes.rts.application.api.robot.ports.MoveRobotCommand;
+import com.sysdes.rts.application.spi.events.dto.Event;
+import com.sysdes.rts.application.spi.events.dto.EventType;
+import com.sysdes.rts.application.spi.events.ports.EventPublisher;
 import com.sysdes.rts.application.spi.repository.RobotTrackerRepository;
+import com.sysdes.rts.application.utils.DateTimeUtil;
 import com.sysdes.rts.application.utils.Mapper;
 import com.sysdes.rts.application.utils.Validation;
 import lombok.AllArgsConstructor;
@@ -29,6 +33,7 @@ public class RobotTrackerService implements CreateRobotCommand, GetRobotCommand,
 
     private final RobotTrackerRepository robotTrackerRepository;
     private final HoleService holeService;
+    private final EventPublisher eventPublisher;
 
     @Override
     public CreateRobotResponse createRobot(CreateRobotRequest request) throws InvalidArgumentException, ResourceAlreadyExistsException {
@@ -59,7 +64,14 @@ public class RobotTrackerService implements CreateRobotCommand, GetRobotCommand,
         if(!alive.isPresent())
             throw new IllegalStateException("Robot " + request.getName() + " is already dead and cannot be moved");
 
-        return alive.map(r -> moveAndSaveRobot(r, request)).get();
+        MoveRobotResponse response = alive.map(r -> moveAndSaveRobot(r, request)).get();
+        eventPublisher.publishEvent(Event.builder()
+                .data(response)
+                .type(EventType.MOVE_ROBOT)
+                .createdAt(DateTimeUtil.now())
+                .build()
+        );
+        return response;
     }
 
     private MoveRobotResponse moveAndSaveRobot(Robot r, MoveRobotRequest request){

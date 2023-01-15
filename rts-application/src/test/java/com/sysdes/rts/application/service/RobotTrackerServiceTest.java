@@ -17,18 +17,24 @@ import com.sysdes.rts.application.model.Robot;
 import com.sysdes.rts.application.api.robot.ports.CreateRobotCommand;
 import com.sysdes.rts.application.api.robot.ports.GetRobotCommand;
 import com.sysdes.rts.application.api.robot.ports.MoveRobotCommand;
+import com.sysdes.rts.application.spi.events.dto.Event;
+import com.sysdes.rts.application.spi.events.dto.EventType;
+import com.sysdes.rts.application.spi.events.ports.EventPublisher;
 import com.sysdes.rts.application.spi.repository.RobotTrackerRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class RobotTrackerServiceTest {
 
@@ -38,15 +44,22 @@ class RobotTrackerServiceTest {
 
     private RobotTrackerRepository robotTrackerRepository;
     private HoleService holeService;
+    private EventPublisher eventPublisher;
+
+    @Captor
+    private ArgumentCaptor<Event<MoveRobotResponse>> eventArgumentCaptor;
 
     @BeforeEach
     public void test_beforeEach() {
         robotTrackerRepository = Mockito.mock(RobotTrackerRepository.class);
         holeService = Mockito.mock(HoleService.class);
+        eventPublisher = Mockito.mock(EventPublisher.class);
 
-        createRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService);
-        getRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService);
-        moveRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService);
+        createRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService, eventPublisher);
+        getRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService, eventPublisher);
+        moveRobotCommand = new RobotTrackerService(robotTrackerRepository, holeService, eventPublisher);
+
+        MockitoAnnotations.initMocks(this);
     }
 
     /********************************** USE CASE: CreteRobot ******************************************************/
@@ -151,17 +164,23 @@ class RobotTrackerServiceTest {
                 .currentLocation(new Location(0, 0))
                 .status(RobotStatus.ALIVE)
                 .build();
+
+        when(holeService.getHole(any())).thenReturn(Optional.empty());
+        when(eventPublisher.publishEvent(any())).thenReturn(Optional.empty());
         when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.ofNullable(mockRobot));
         when(robotTrackerRepository.save(any(Robot.class))).thenReturn(mockRobot);
         MoveRobotRequest req = new MoveRobotRequest(name, move);
         MoveRobotResponse res = moveRobotCommand.moveRobot(req);
-
         assertNotNull(res);
         assertEquals(res.getName(), name);
         assertEquals(res.getMovement(), move);
         assertEquals(res.getCurrentLocation(), new Location(1, 1));
         assertEquals(res.getOldLocation(), mockRobot.getCurrentLocation());
         assertEquals(res.getStatus(), mockRobot.getStatus());
+
+        verify(eventPublisher, times(1)).publishEvent(eventArgumentCaptor.capture());
+        assertEquals(eventArgumentCaptor.getValue().getData(), res);
+        assertEquals(eventArgumentCaptor.getValue().getType(), EventType.MOVE_ROBOT);
     }
 
     @Test
@@ -178,6 +197,7 @@ class RobotTrackerServiceTest {
                 .currentLocation(new Location(0, 0))
                 .build();
         when(holeService.getHole(any())).thenReturn(Optional.empty());
+        when(eventPublisher.publishEvent(any())).thenReturn(Optional.empty());
         when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.ofNullable(mockRobot));
         when(robotTrackerRepository.save(any(Robot.class))).thenReturn(mockRobot);
         MoveRobotRequest req = new MoveRobotRequest(name, move);
@@ -188,6 +208,10 @@ class RobotTrackerServiceTest {
         assertEquals(res.getMovement(), move);
         assertEquals(res.getCurrentLocation(), new Location(1, -1));
         assertEquals(res.getOldLocation(), mockRobot.getCurrentLocation());
+
+        verify(eventPublisher, times(1)).publishEvent(eventArgumentCaptor.capture());
+        assertEquals(eventArgumentCaptor.getValue().getData(), res);
+        assertEquals(eventArgumentCaptor.getValue().getType(), EventType.MOVE_ROBOT);
     }
 
     @Test
@@ -209,6 +233,7 @@ class RobotTrackerServiceTest {
         Assertions.assertThrows(InvalidArgumentException.class,
                 () -> moveRobotCommand.moveRobot(new MoveRobotRequest("robot", null))
         );
+        verify(holeService,times(0)).getHole(any());
     }
 
     @Test
@@ -216,6 +241,7 @@ class RobotTrackerServiceTest {
         when(robotTrackerRepository.findRobotByName(any())).thenReturn(Optional.empty());
         Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> moveRobotCommand.moveRobot(new MoveRobotRequest("robot", Movement.builder().build())));
+        verify(holeService,times(0)).getHole(any());
     }
 
     @Test
@@ -232,6 +258,7 @@ class RobotTrackerServiceTest {
                 .currentLocation(new Location(0, 0))
                 .build();
         when(holeService.getHole(any())).thenReturn(Optional.ofNullable(Location.builder().x(1).y(-1).build()));
+        when(eventPublisher.publishEvent(any())).thenReturn(Optional.empty());
         when(robotTrackerRepository.findRobotByName(eq(name))).thenReturn(Optional.of(mockRobot));
         when(robotTrackerRepository.save(any(Robot.class))).thenReturn(mockRobot);
         MoveRobotRequest req = new MoveRobotRequest(name, move);
@@ -243,6 +270,10 @@ class RobotTrackerServiceTest {
         assertEquals(res.getCurrentLocation(), new Location(1, -1));
         assertEquals(res.getOldLocation(), mockRobot.getCurrentLocation());
         assertEquals(res.getStatus(), RobotStatus.DEAD);
+
+        verify(eventPublisher, times(1)).publishEvent(eventArgumentCaptor.capture());
+        assertEquals(eventArgumentCaptor.getValue().getData(), res);
+        assertEquals(eventArgumentCaptor.getValue().getType(), EventType.MOVE_ROBOT);
     }
 
     @Test

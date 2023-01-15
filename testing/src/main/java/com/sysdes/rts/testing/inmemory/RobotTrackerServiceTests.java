@@ -12,6 +12,9 @@ import com.sysdes.rts.application.model.Location;
 import com.sysdes.rts.application.model.Movement;
 import com.sysdes.rts.application.service.HoleService;
 import com.sysdes.rts.application.service.RobotTrackerService;
+import com.sysdes.rts.application.spi.events.dto.Event;
+import com.sysdes.rts.application.spi.events.dto.PublishEventResponse;
+import com.sysdes.rts.application.spi.events.ports.EventPublisher;
 import com.sysdes.rts.application.spi.repository.RobotTrackerRepository;
 import com.sysdes.rts.dal.adapter.RobotTrackerRepositoryAdapter;
 import com.sysdes.rts.dal.storage.InMemoryStore;
@@ -20,16 +23,24 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 public class RobotTrackerServiceTests {
     private RobotTrackerService rts;
     private HoleService hs;
+    private EventPublisher eventPublisher;
 
     @BeforeEach
     public void beforeEach(){
         RobotTrackerRepository rtr = new RobotTrackerRepositoryAdapter(new InMemoryStore(new HashMap<>(), new HashMap<>()));
         hs = new HoleService(rtr);
-        rts = new RobotTrackerService(rtr, hs);
+        eventPublisher = new EventPublisher() {
+            @Override
+            public <T> Optional<PublishEventResponse<T>> publishEvent(Event<T> event) {
+                return Optional.empty();
+            }
+        };
+        rts = new RobotTrackerService(rtr, hs, eventPublisher);
     }
 
 
