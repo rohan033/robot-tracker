@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### POSTGRES docker path ###
+var/
+
+
+**/dependency-reduced-pom.xml
+

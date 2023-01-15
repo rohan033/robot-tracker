@@ -1,0 +1,3 @@
+CREATE DATABASE rts;
+CREATE USER root WITH password 'root';
+GRANT ALL PRIVILEGES ON DATABASE rts TO root;
