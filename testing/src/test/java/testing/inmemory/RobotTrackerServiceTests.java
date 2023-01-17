@@ -1,4 +1,4 @@
-package com.sysdes.rts.testing.inmemory;
+package testing.inmemory;
 
 import com.sysdes.rts.application.api.robot.dto.request.CreateRobotRequest;
 import com.sysdes.rts.application.api.robot.dto.request.MoveRobotRequest;
