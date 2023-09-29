@@ -6,6 +6,9 @@ import com.sysdes.rts.application.api.robot.dto.request.MoveRobotRequest;
 import com.sysdes.rts.application.api.robot.dto.response.CreateRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.GetRobotResponse;
 import com.sysdes.rts.application.api.robot.dto.response.MoveRobotResponse;
+import com.sysdes.rts.application.api.robot.ports.CreateRobotCommand;
+import com.sysdes.rts.application.api.robot.ports.GetRobotCommand;
+import com.sysdes.rts.application.api.robot.ports.MoveRobotCommand;
 import com.sysdes.rts.application.enums.RobotStatus;
 import com.sysdes.rts.application.exception.IllegalStateException;
 import com.sysdes.rts.application.exception.InvalidArgumentException;
@@ -30,8 +33,10 @@ import static org.mockito.Mockito.*;
 
 public class RobotControllerTest {
 
-    private RobotTrackerService robotTrackerService;
     private RobotController robotController;
+    private CreateRobotCommand createRobotCommand;
+    private GetRobotCommand getRobotCommand;
+    private MoveRobotCommand moveRobotCommand;
 
     @Captor
     private ArgumentCaptor<GetRobotRequest> getRobotRequestArgumentCaptor;
@@ -42,8 +47,10 @@ public class RobotControllerTest {
 
     @BeforeEach
     public void beforeEach(){
-        robotTrackerService = Mockito.mock(RobotTrackerService.class);
-        robotController = new RobotController(robotTrackerService);
+        createRobotCommand = Mockito.mock(CreateRobotCommand.class);
+        getRobotCommand = Mockito.mock(GetRobotCommand.class);
+        moveRobotCommand = Mockito.mock(MoveRobotCommand.class);
+        robotController = new RobotController(createRobotCommand, getRobotCommand, moveRobotCommand);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -55,7 +62,7 @@ public class RobotControllerTest {
                 .currentLocation(new Location(0,0))
                 .status(RobotStatus.ALIVE)
                 .build();
-        when(robotTrackerService.createRobot(any())).thenReturn(res);
+        when(createRobotCommand.createRobot(any())).thenReturn(res);
         ResponseEntity<ServiceResponse<CreateRobotResponse>> apiResponse =  robotController.create(req);
 
         Assertions.assertNotNull(apiResponse);
@@ -64,14 +71,14 @@ public class RobotControllerTest {
         Assertions.assertEquals(apiResponse.getBody().getData(), res);
         Assertions.assertNull(apiResponse.getBody().getError());
 
-        verify(robotTrackerService, times(1)).createRobot(createRobotRequestArgumentCaptor.capture());
+        verify(createRobotCommand, times(1)).createRobot(createRobotRequestArgumentCaptor.capture());
         Assertions.assertEquals(createRobotRequestArgumentCaptor.getValue(), req);
     }
 
     @Test
     public void test_create_error() throws InvalidArgumentException, ResourceAlreadyExistsException {
         CreateRobotRequest req = new CreateRobotRequest("sofia", new Location(0,0));
-        when(robotTrackerService.createRobot(any())).thenThrow(
+        when(createRobotCommand.createRobot(any())).thenThrow(
                 new InvalidArgumentException(new String[]{"Invalid values"})
         );
         ResponseEntity<ServiceResponse<CreateRobotResponse>> apiResponse =  robotController.create(req);
@@ -83,7 +90,7 @@ public class RobotControllerTest {
         Assertions.assertNotNull(apiResponse.getBody().getError());
         Assertions.assertEquals(apiResponse.getBody().getError().getMessage(),"[Invalid values]");
 
-        verify(robotTrackerService, times(1)).createRobot(createRobotRequestArgumentCaptor.capture());
+        verify(createRobotCommand, times(1)).createRobot(createRobotRequestArgumentCaptor.capture());
         Assertions.assertEquals(createRobotRequestArgumentCaptor.getValue(), req);
     }
 
@@ -94,7 +101,7 @@ public class RobotControllerTest {
                 .currentLocation(new Location(0,0))
                 .status(RobotStatus.ALIVE)
                 .build();
-        when(robotTrackerService.getRobot(any())).thenReturn(res);
+        when(getRobotCommand.getRobot(any())).thenReturn(res);
         ResponseEntity<ServiceResponse<GetRobotResponse>> apiResponse =  robotController.get("sofia");
 
         Assertions.assertNotNull(apiResponse);
@@ -103,13 +110,13 @@ public class RobotControllerTest {
         Assertions.assertEquals(apiResponse.getBody().getData(), res);
         Assertions.assertNull(apiResponse.getBody().getError());
 
-        verify(robotTrackerService, times(1)).getRobot(getRobotRequestArgumentCaptor.capture());
+        verify(getRobotCommand, times(1)).getRobot(getRobotRequestArgumentCaptor.capture());
         Assertions.assertEquals(getRobotRequestArgumentCaptor.getValue().getName(), "sofia");
     }
 
     @Test
     public void test_get_error() throws InvalidArgumentException, ResourceNotFoundException {
-        when(robotTrackerService.getRobot(any())).thenThrow(
+        when(getRobotCommand.getRobot(any())).thenThrow(
                 new InvalidArgumentException(new String[]{"Invalid values"})
         );
         ResponseEntity<ServiceResponse<GetRobotResponse>> apiResponse =  robotController.get("sofia");
@@ -121,7 +128,7 @@ public class RobotControllerTest {
         Assertions.assertNotNull(apiResponse.getBody().getError());
         Assertions.assertEquals(apiResponse.getBody().getError().getMessage(),"[Invalid values]");
 
-        verify(robotTrackerService, times(1)).getRobot(getRobotRequestArgumentCaptor.capture());
+        verify(getRobotCommand, times(1)).getRobot(getRobotRequestArgumentCaptor.capture());
         Assertions.assertEquals(getRobotRequestArgumentCaptor.getValue().getName(), "sofia");
     }
 
@@ -135,7 +142,7 @@ public class RobotControllerTest {
                 .currentLocation(new Location(1,0))
                 .status(RobotStatus.ALIVE)
                 .build();
-        when(robotTrackerService.moveRobot(any())).thenReturn(res);
+        when(moveRobotCommand.moveRobot(any())).thenReturn(res);
         ResponseEntity<ServiceResponse<MoveRobotResponse>> apiResponse =  robotController.move(req);
 
         Assertions.assertNotNull(apiResponse);
@@ -144,14 +151,14 @@ public class RobotControllerTest {
         Assertions.assertEquals(apiResponse.getBody().getData(), res);
         Assertions.assertNull(apiResponse.getBody().getError());
 
-        verify(robotTrackerService, times(1)).moveRobot(moveRobotRequestArgumentCaptor.capture());
+        verify(moveRobotCommand, times(1)).moveRobot(moveRobotRequestArgumentCaptor.capture());
         Assertions.assertEquals(moveRobotRequestArgumentCaptor.getValue(), req);
     }
 
     @Test
     public void test_move_error() throws InvalidArgumentException, ResourceNotFoundException, IllegalStateException {
         MoveRobotRequest req = new MoveRobotRequest("sofia", Movement.builder().east(1).build());
-        when(robotTrackerService.moveRobot(any())).thenThrow(
+        when(moveRobotCommand.moveRobot(any())).thenThrow(
                 new InvalidArgumentException(new String[]{"Invalid values"})
         );
         ResponseEntity<ServiceResponse<MoveRobotResponse>> apiResponse =  robotController.move(req);
@@ -163,7 +170,7 @@ public class RobotControllerTest {
         Assertions.assertNotNull(apiResponse.getBody().getError());
         Assertions.assertEquals(apiResponse.getBody().getError().getMessage(),"[Invalid values]");
 
-        verify(robotTrackerService, times(1)).moveRobot(moveRobotRequestArgumentCaptor.capture());
+        verify(moveRobotCommand, times(1)).moveRobot(moveRobotRequestArgumentCaptor.capture());
         Assertions.assertEquals(moveRobotRequestArgumentCaptor.getValue(), req);
     }
 }
